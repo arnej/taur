@@ -74,20 +74,28 @@ fn fetch(proj_dirs: ProjectDirs, repos: Option<PathBuf>) -> Result<(), Box<dyn s
     let mut update_infos: Vec<UpdateInfo> = Vec::new();
 
     let (tx, rx) = mpsc::channel();
+    let mut join_handles = vec![];
 
     for dir in dirs {
         let tx = mpsc::Sender::clone(&tx);
         let path_base = repo_path.clone();
-        thread::spawn(
+        join_handles.push(thread::spawn(
             move || match check_repo_updates(dir, path_base.to_path_buf(), tx) {
                 Ok(_) => {}
                 Err(e) => eprintln!("Error while checking for updates for repo {:?}", e),
             },
-        );
+        ));
     }
 
     // Drop tx to get rid of the original unused sender
     drop(tx);
+
+    for join_handle in join_handles {
+        match join_handle.join() {
+            Ok(_) => {},
+            Err(e) => eprintln!("Failed to join thread: {:?}", e)
+        };
+    }
 
     for received in rx {
         update_infos.push(received);
