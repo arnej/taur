@@ -262,8 +262,7 @@ fn check_repo_updates(
             let oid = oid?;
             let commit = repo.find_commit(oid)?;
             if let Some(c) = commit.message() {
-                // TODO: Remove all empty lines
-                commits.push(c.replace("\n\n", "\n"));
+                commits.push(String::from(c));
             }
         }
 
