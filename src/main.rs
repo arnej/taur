@@ -79,12 +79,12 @@ fn fetch(proj_dirs: ProjectDirs, repos: Option<PathBuf>) -> Result<(), Box<dyn s
     for dir in dirs {
         let tx = mpsc::Sender::clone(&tx);
         let path_base = repo_path.clone();
-        join_handles.push(thread::spawn(
-            move || match check_repo_updates(dir, path_base.to_path_buf(), tx) {
+        join_handles.push(thread::spawn(move || {
+            match check_repo_updates(dir, path_base.to_path_buf(), tx) {
                 Ok(_) => {}
                 Err(e) => eprintln!("Error while checking for updates for repo {:?}", e),
-            },
-        ));
+            }
+        }));
     }
 
     // Drop tx to get rid of the original unused sender
@@ -92,8 +92,8 @@ fn fetch(proj_dirs: ProjectDirs, repos: Option<PathBuf>) -> Result<(), Box<dyn s
 
     for join_handle in join_handles {
         match join_handle.join() {
-            Ok(_) => {},
-            Err(e) => eprintln!("Failed to join thread: {:?}", e)
+            Ok(_) => {}
+            Err(e) => eprintln!("Failed to join thread: {:?}", e),
         };
     }
 
@@ -127,39 +127,61 @@ fn pull(
         std::fs::create_dir_all(repo_path.as_ref())?;
     }
 
+    let mut join_handles = vec![];
+
     for package_name in package_names {
-        let full_path = repo_path.join(package_name);
-
-        let repo = Repository::open(full_path)?;
-
-        let mut remote = repo.find_remote(&"origin")?;
-        remote.fetch(&["master"], None, None)?;
-
-        let fetch_head = repo.find_reference("FETCH_HEAD")?;
-        let fetch_commit = repo.reference_to_annotated_commit(&fetch_head)?;
-
-        let mut refs_heads_master = repo.find_reference("refs/heads/master")?;
-
-        let name = match refs_heads_master.name() {
-            Some(name) => name.to_string(),
-            None => String::from_utf8_lossy(refs_heads_master.name_bytes()).to_string(),
-        };
-
-        // TODO: Output which commits were added
-
-        let msg = format!(
-            "Fast-Forward: Setting {} to id: {}",
-            name,
-            fetch_commit.id()
-        );
-        refs_heads_master.set_target(fetch_commit.id(), &msg)?;
-
-        repo.set_head(&name)?;
-
-        let checkout = &mut git2::build::CheckoutBuilder::default();
-        checkout.force();
-        repo.checkout_head(Some(checkout))?;
+        let package_name = package_name.clone();
+        let path_base = repo_path.clone();
+        join_handles.push(thread::spawn(move || {
+            match pull_package(&path_base, &package_name) {
+                Ok(_) => {}
+                Err(e) => eprintln!("Error while pulling package: {:?}", e),
+            }
+        }));
     }
+
+    for join_handle in join_handles {
+        match join_handle.join() {
+            Ok(_) => {}
+            Err(e) => eprintln!("Failed to join thread: {:?}", e),
+        };
+    }
+
+    Ok(())
+}
+
+fn pull_package(repo_path: &Path, package_name: &str) -> Result<(), Box<dyn std::error::Error>> {
+    let full_path = repo_path.join(package_name);
+
+    let repo = Repository::open(full_path)?;
+
+    let mut remote = repo.find_remote(&"origin")?;
+    remote.fetch(&["master"], None, None)?;
+
+    let fetch_head = repo.find_reference("FETCH_HEAD")?;
+    let fetch_commit = repo.reference_to_annotated_commit(&fetch_head)?;
+
+    let mut refs_heads_master = repo.find_reference("refs/heads/master")?;
+
+    let name = match refs_heads_master.name() {
+        Some(name) => name.to_string(),
+        None => String::from_utf8_lossy(refs_heads_master.name_bytes()).to_string(),
+    };
+
+    // TODO: Output which commits were added
+
+    let msg = format!(
+        "Fast-Forward: Setting {} to id: {}",
+        name,
+        fetch_commit.id()
+    );
+    refs_heads_master.set_target(fetch_commit.id(), &msg)?;
+
+    repo.set_head(&name)?;
+
+    let checkout = &mut git2::build::CheckoutBuilder::default();
+    checkout.force();
+    repo.checkout_head(Some(checkout))?;
 
     Ok(())
 }
