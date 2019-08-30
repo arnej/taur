@@ -198,7 +198,6 @@ fn get_repo_path(
 
 fn print_update_info(mut update_infos: Vec<UpdateInfo>) {
     if !update_infos.is_empty() {
-        println!();
         println!(
             "{}The following packages have upstream changes:{}",
             style::Bold,
@@ -229,6 +228,9 @@ fn print_update_info(mut update_infos: Vec<UpdateInfo>) {
                 );
             }
         }
+    }
+    else {
+        println!("There are currently no packages with upstream changes");
     }
 }
 
