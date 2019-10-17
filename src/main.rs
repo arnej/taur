@@ -19,6 +19,8 @@ struct Args {
 
 #[derive(Debug, StructOpt)]
 enum Command {
+    #[structopt(name = "clone")]
+    Clone { package_name: String },
     #[structopt(name = "fetch")]
     Fetch,
     #[structopt(name = "search")]
@@ -53,12 +55,33 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     match &args.command {
         Some(cmd) => match cmd {
+            Command::Clone { package_name } => clone(proj_dirs, args.repos, package_name)?,
             Command::Fetch => fetch(proj_dirs, args.repos)?,
             Command::Pull { package_names } => pull(proj_dirs, args.repos, package_names)?,
             Command::Search { expression } => search(expression)?,
         },
         None => fetch(proj_dirs, args.repos)?,
     }
+
+    Ok(())
+}
+
+fn clone(proj_dirs: ProjectDirs, repos: Option<PathBuf>, package_name: &str) -> Result<(), Box<dyn std::error::Error>> {
+    let repo_path = get_repo_path(proj_dirs, repos)?;
+    if !repo_path.exists() {
+        std::fs::create_dir_all(repo_path.as_ref())?;
+    }
+
+    let repo_path = repo_path.join(package_name);
+
+    let mut url = String::from("https://aur.archlinux.org/");
+    url.push_str(package_name);
+    url.push_str(".git");
+
+    match Repository::clone(&url, &repo_path) {
+        Ok(_) => println!("Cloned repo '{}' to '{:?}'", package_name, repo_path),
+        Err(e) => eprintln!("Error while cloning repo '{}': {}", package_name, e)
+    };
 
     Ok(())
 }
