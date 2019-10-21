@@ -11,6 +11,7 @@ use termion::{color, style};
 #[derive(Debug, StructOpt)]
 #[structopt(name = "taur", about = "Tiny AUR helper")]
 struct Args {
+    /// Local repo storage path (defaults to $HOME/.local/share/taur/repos)
     #[structopt()]
     repos: Option<PathBuf>,
     #[structopt(subcommand)]
@@ -19,12 +20,16 @@ struct Args {
 
 #[derive(Debug, StructOpt)]
 enum Command {
+    /// Clone a repository from AUR
     #[structopt(name = "clone")]
     Clone { package_name: String },
+    /// Fetch and print new commits for all repositories
     #[structopt(name = "fetch")]
     Fetch,
+    /// Search for packages in AUR
     #[structopt(name = "search")]
     Search { expression: String },
+    /// Pull given package repositories (if no package is specified, all repositories are pulled)
     #[structopt(name = "pull")]
     Pull { package_names: Vec<String> },
 }
