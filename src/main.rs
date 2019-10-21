@@ -90,7 +90,11 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     Ok(())
 }
 
-fn clone(proj_dirs: ProjectDirs, repos: Option<PathBuf>, package_name: &str) -> Result<(), Box<dyn std::error::Error>> {
+fn clone(
+    proj_dirs: ProjectDirs,
+    repos: Option<PathBuf>,
+    package_name: &str,
+) -> Result<(), Box<dyn std::error::Error>> {
     let repo_path = get_repo_path(proj_dirs, repos)?;
     if !repo_path.exists() {
         std::fs::create_dir_all(repo_path.as_ref())?;
@@ -104,7 +108,7 @@ fn clone(proj_dirs: ProjectDirs, repos: Option<PathBuf>, package_name: &str) -> 
 
     match Repository::clone(&url, &repo_path) {
         Ok(_) => println!("Cloned repo '{}' to '{:?}'", package_name, repo_path),
-        Err(e) => eprintln!("Error while cloning repo '{}': {}", package_name, e)
+        Err(e) => eprintln!("Error while cloning repo '{}': {}", package_name, e),
     };
 
     Ok(())
@@ -275,8 +279,7 @@ fn print_update_info(mut update_infos: Vec<UpdateInfo>) {
                 );
             }
         }
-    }
-    else {
+    } else {
         println!("There are currently no packages with upstream changes");
     }
 }
