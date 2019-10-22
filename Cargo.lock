@@ -1249,7 +1249,7 @@ dependencies = [
 
 [[package]]
 name = "taur"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "directories 2.0.2 (registry+https://github.com/rust-lang/crates.io-index)",
  "git2 0.10.1 (registry+https://github.com/rust-lang/crates.io-index)",
