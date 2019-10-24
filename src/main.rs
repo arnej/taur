@@ -20,6 +20,7 @@
 use directories::ProjectDirs;
 use git2::Repository;
 use std::ffi::OsString;
+use std::fmt::Display;
 use std::io::Error;
 use std::path::{Path, PathBuf};
 use std::sync::mpsc;
@@ -57,6 +58,34 @@ enum Command {
 struct UpdateInfo {
     name: String,
     commits: Vec<String>,
+}
+
+impl Display for UpdateInfo {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        writeln!(
+            f,
+            "{}{}:: {}{}{}",
+            style::Bold,
+            color::Fg(color::Blue),
+            color::Fg(color::Reset),
+            self.name,
+            style::Reset
+        )?;
+        writeln!(f)?;
+
+        for commit in &self.commits {
+            writeln!(
+                f,
+                "{}* {}{}{}",
+                color::Fg(color::Magenta),
+                color::Fg(color::Cyan),
+                commit,
+                style::Reset
+            )?;
+        }
+
+        Ok(())
+    }
 }
 
 impl PartialEq for UpdateInfo {
@@ -259,25 +288,7 @@ fn print_update_info(mut update_infos: Vec<UpdateInfo>) {
         update_infos.sort_unstable();
 
         for info in update_infos {
-            println!(
-                "{}{}:: {}{}{}",
-                style::Bold,
-                color::Fg(color::Blue),
-                color::Fg(color::Reset),
-                info.name,
-                style::Reset
-            );
-            println!();
-
-            for commit in info.commits {
-                println!(
-                    "{}* {}{}{}",
-                    color::Fg(color::Magenta),
-                    color::Fg(color::Cyan),
-                    commit,
-                    style::Reset
-                );
-            }
+            println!("{}", info);
         }
     } else {
         println!("There are currently no packages with upstream changes");
