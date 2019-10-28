@@ -160,8 +160,16 @@ fn fetch(proj_dirs: ProjectDirs, repos: Option<PathBuf>) -> Result<(), Box<dyn s
         let tx = mpsc::Sender::clone(&tx);
         let path_base = repo_path.clone();
         join_handles.push(thread::spawn(move || {
-            match check_repo_updates(dir, path_base.to_path_buf(), tx) {
-                Ok(_) => {}
+            let full_path = path_base.join(dir);
+            match check_repo_updates(full_path) {
+                Ok(update_info) => {
+                    if let Some(update_info) = update_info {
+                        match tx.send(update_info) {
+                            Ok(_) => {},
+                            Err(e) => eprintln!("Error while sending update info for printing: {}", e),
+                        }
+                    }
+                }
                 Err(e) => eprintln!("Error while checking for updates for repo {:?}", e),
             }
         }));
@@ -296,14 +304,12 @@ fn print_update_info(mut update_infos: Vec<UpdateInfo>) {
 }
 
 fn check_repo_updates(
-    dir: OsString,
-    path_base: PathBuf,
-    tx: mpsc::Sender<UpdateInfo>,
-) -> Result<(), Box<dyn std::error::Error>> {
-    let dir_name = String::from(dir.to_string_lossy());
-    let full_path = path_base.join(dir);
+    path: PathBuf
+) -> Result<Option<UpdateInfo>, Box<dyn std::error::Error>> {
+    let dir_name = path.file_name().ok_or("File name was None?!")?;
+    let dir_name = String::from(dir_name.to_string_lossy());
 
-    let repo = Repository::open(full_path)?;
+    let repo = Repository::open(path)?;
     let mut remote = repo.find_remote(&"origin")?;
     remote.fetch(&["master"], None, None)?;
 
@@ -329,13 +335,13 @@ fn check_repo_updates(
             }
         }
 
-        tx.send(UpdateInfo {
+        return Ok(Some(UpdateInfo {
             name: dir_name,
             commits,
-        })?;
+        }));
     }
 
-    Ok(())
+    Ok(None)
 }
 
 fn get_dir_list(pathbuf: &PathBuf) -> Result<Vec<OsString>, Error> {
