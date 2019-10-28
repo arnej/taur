@@ -165,8 +165,10 @@ fn fetch(proj_dirs: ProjectDirs, repos: Option<PathBuf>) -> Result<(), Box<dyn s
                 Ok(update_info) => {
                     if let Some(update_info) = update_info {
                         match tx.send(update_info) {
-                            Ok(_) => {},
-                            Err(e) => eprintln!("Error while sending update info for printing: {}", e),
+                            Ok(_) => {}
+                            Err(e) => {
+                                eprintln!("Error while sending update info for printing: {}", e)
+                            }
                         }
                     }
                 }
@@ -241,10 +243,29 @@ fn pull(
 fn pull_package(repo_path: &Path, package_name: &str) -> Result<(), Box<dyn std::error::Error>> {
     let full_path = repo_path.join(package_name);
 
-    let repo = Repository::open(full_path)?;
+    let repo = Repository::open(&full_path)?;
 
-    let mut remote = repo.find_remote(&"origin")?;
-    remote.fetch(&["master"], None, None)?;
+    let update_info = check_repo_updates(full_path)?;
+
+    match update_info {
+        Some(update_info) => {
+            println!("{}Pulling {}...{}", style::Bold, package_name, style::Reset);
+            println!();
+            for commit in update_info.commits {
+                println!(
+                    "{}* {}{}{}",
+                    color::Fg(color::Magenta),
+                    color::Fg(color::Cyan),
+                    commit,
+                    style::Reset
+                );
+            }
+        }
+        None => {
+            println!("No new commits to pull");
+            return Ok(());
+        }
+    }
 
     let fetch_head = repo.find_reference("FETCH_HEAD")?;
     let fetch_commit = repo.reference_to_annotated_commit(&fetch_head)?;
@@ -255,8 +276,6 @@ fn pull_package(repo_path: &Path, package_name: &str) -> Result<(), Box<dyn std:
         Some(name) => name.to_string(),
         None => String::from_utf8_lossy(refs_heads_master.name_bytes()).to_string(),
     };
-
-    // TODO: Output which commits were added
 
     let msg = format!(
         "Fast-Forward: Setting {} to id: {}",
@@ -303,9 +322,7 @@ fn print_update_info(mut update_infos: Vec<UpdateInfo>) {
     }
 }
 
-fn check_repo_updates(
-    path: PathBuf
-) -> Result<Option<UpdateInfo>, Box<dyn std::error::Error>> {
+fn check_repo_updates(path: PathBuf) -> Result<Option<UpdateInfo>, Box<dyn std::error::Error>> {
     let dir_name = path.file_name().ok_or("File name was None?!")?;
     let dir_name = String::from(dir_name.to_string_lossy());
 
