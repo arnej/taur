@@ -108,10 +108,22 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     match &args.command {
         Some(cmd) => match cmd {
-            Command::Clone { package_name } => clone(proj_dirs, args.repos, package_name)?,
-            Command::Fetch => fetch(proj_dirs, args.repos)?,
-            Command::Pull { package_names } => pull(proj_dirs, args.repos, package_names)?,
-            Command::Search { expression } => search(expression)?,
+            Command::Clone { package_name } => match clone(proj_dirs, args.repos, package_name) {
+                Ok(_) => {}
+                Err(e) => eprintln!("Error while cloning: {}", e),
+            },
+            Command::Fetch => match fetch(proj_dirs, args.repos) {
+                Ok(_) => {}
+                Err(e) => eprintln!("Error while fetching: {}", e),
+            },
+            Command::Pull { package_names } => match pull(proj_dirs, args.repos, package_names) {
+                Ok(_) => {}
+                Err(e) => eprintln!("Error while pulling: {}", e),
+            },
+            Command::Search { expression } => match search(expression) {
+                Ok(_) => {}
+                Err(e) => eprintln!("Error while searching: {}", e),
+            },
         },
         None => fetch(proj_dirs, args.repos)?,
     }
@@ -148,7 +160,12 @@ fn clone(
 
     match Repository::clone(&url, &repo_path) {
         Ok(_) => println!("Cloned repo '{}' to '{:?}'", package_name, repo_path),
-        Err(e) => eprintln!("Error while cloning repo '{}': {}", package_name, e),
+        Err(e) => {
+            return Err(Box::new(Error::new(
+                ErrorKind::Other,
+                format!("Error while cloning repo '{}': {}", package_name, e),
+            )))
+        }
     };
 
     Ok(())
@@ -194,7 +211,12 @@ fn fetch(proj_dirs: ProjectDirs, repos: Option<PathBuf>) -> Result<(), Box<dyn s
     for join_handle in join_handles {
         match join_handle.join() {
             Ok(_) => {}
-            Err(e) => eprintln!("Failed to join thread: {:?}", e),
+            Err(e) => {
+                return Err(Box::new(Error::new(
+                    ErrorKind::Other,
+                    format!("Failed to join thread: {:?}", e),
+                )))
+            }
         };
     }
 
@@ -244,7 +266,12 @@ fn pull(
     for join_handle in join_handles {
         match join_handle.join() {
             Ok(_) => {}
-            Err(e) => eprintln!("Failed to join thread: {:?}", e),
+            Err(e) => {
+                return Err(Box::new(Error::new(
+                    ErrorKind::Other,
+                    format!("Failed to join thread: {:?}", e),
+                )))
+            }
         };
     }
 
