@@ -21,7 +21,7 @@ use directories::ProjectDirs;
 use git2::Repository;
 use std::ffi::OsString;
 use std::fmt::Display;
-use std::io::Error;
+use std::io::{Error, ErrorKind};
 use std::path::{Path, PathBuf};
 use std::sync::mpsc;
 use std::thread;
@@ -124,6 +124,17 @@ fn clone(
     repos: Option<PathBuf>,
     package_name: &str,
 ) -> Result<(), Box<dyn std::error::Error>> {
+    match raur::info(&[package_name]) {
+        Ok(pkgs) => {
+            if pkgs.is_empty() {
+                return Err(Box::new(Error::new(
+                    ErrorKind::NotFound,
+                    format!("Package '{}' not found", package_name),
+                )));
+            }
+        }
+        Err(e) => return Err(Box::new(e)),
+    };
     let repo_path = get_repo_path(proj_dirs, repos)?;
     if !repo_path.exists() {
         std::fs::create_dir_all(repo_path.as_ref())?;
