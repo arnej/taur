@@ -108,24 +108,32 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     match &args.command {
         Some(cmd) => match cmd {
-            Command::Clone { package_name } => match clone(proj_dirs, args.repos, package_name) {
-                Ok(_) => {}
-                Err(e) => eprintln!("Error while cloning: {}", e),
-            },
-            Command::Fetch => match fetch(proj_dirs, args.repos) {
-                Ok(_) => {}
-                Err(e) => eprintln!("Error while fetching: {}", e),
-            },
-            Command::Pull { package_names } => match pull(proj_dirs, args.repos, package_names) {
-                Ok(_) => {}
-                Err(e) => eprintln!("Error while pulling: {}", e),
-            },
-            Command::Search { expression } => match search(expression) {
-                Ok(_) => {}
-                Err(e) => eprintln!("Error while searching: {}", e),
-            },
+            Command::Clone { package_name } => {
+                if let Err(e) = clone(proj_dirs, args.repos, package_name) {
+                    eprintln!("Error while cloning: {}", e);
+                }
+            }
+            Command::Fetch => {
+                if let Err(e) = fetch(proj_dirs, args.repos) {
+                    eprintln!("Error while fetching: {}", e);
+                }
+            }
+            Command::Pull { package_names } => {
+                if let Err(e) = pull(proj_dirs, args.repos, package_names) {
+                    eprintln!("Error while pulling: {}", e);
+                }
+            }
+            Command::Search { expression } => {
+                if let Err(e) = search(expression) {
+                    eprintln!("Error while searching: {}", e);
+                }
+            }
         },
-        None => fetch(proj_dirs, args.repos)?,
+        None => {
+            if let Err(e) = fetch(proj_dirs, args.repos) {
+                eprintln!("Error while fetching: {}", e);
+            }
+        }
     }
 
     Ok(())
@@ -192,11 +200,8 @@ fn fetch(proj_dirs: ProjectDirs, repos: Option<PathBuf>) -> Result<(), Box<dyn s
             match check_repo_updates(full_path) {
                 Ok(update_info) => {
                     if let Some(update_info) = update_info {
-                        match tx.send(update_info) {
-                            Ok(_) => {}
-                            Err(e) => {
-                                eprintln!("Error while sending update info for printing: {}", e)
-                            }
+                        if let Err(e) = tx.send(update_info) {
+                            eprintln!("Error while sending update info for printing: {}", e);
                         }
                     }
                 }
@@ -209,14 +214,11 @@ fn fetch(proj_dirs: ProjectDirs, repos: Option<PathBuf>) -> Result<(), Box<dyn s
     drop(tx);
 
     for join_handle in join_handles {
-        match join_handle.join() {
-            Ok(_) => {}
-            Err(e) => {
-                return Err(Box::new(Error::new(
-                    ErrorKind::Other,
-                    format!("Failed to join thread: {:?}", e),
-                )))
-            }
+        if let Err(e) = join_handle.join() {
+            return Err(Box::new(Error::new(
+                ErrorKind::Other,
+                format!("Failed to join thread: {:?}", e),
+            )));
         };
     }
 
@@ -256,22 +258,18 @@ fn pull(
         let package_name = package_name.clone();
         let path_base = repo_path.clone();
         join_handles.push(thread::spawn(move || {
-            match pull_package(&path_base, &package_name) {
-                Ok(_) => {}
-                Err(e) => eprintln!("Error while pulling package: {:?}", e),
+            if let Err(e) = pull_package(&path_base, &package_name) {
+                eprintln!("Error while pulling package: {:?}", e);
             }
         }));
     }
 
     for join_handle in join_handles {
-        match join_handle.join() {
-            Ok(_) => {}
-            Err(e) => {
-                return Err(Box::new(Error::new(
-                    ErrorKind::Other,
-                    format!("Failed to join thread: {:?}", e),
-                )))
-            }
+        if let Err(e) = join_handle.join() {
+            return Err(Box::new(Error::new(
+                ErrorKind::Other,
+                format!("Failed to join thread: {:?}", e),
+            )))
         };
     }
 
