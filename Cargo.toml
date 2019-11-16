@@ -7,7 +7,7 @@ homepage = "https://github.com/arnej/taur"
 repository = "https://github.com/arnej/taur.git"
 readme = "README.md"
 categories = ["command-line-utilities"]
-keywords = ["arch", "AUR"]
+keywords = ["arch", "archlinux", "AUR"]
 description = """
 A tiny helper for managing AUR package repositories.
 """
