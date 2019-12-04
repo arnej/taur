@@ -14,6 +14,16 @@ Features
 - Clone new packages from AUR
 - Fetch and pull are done in parallel for all specified repositories
 
+Installation
+------------
+
+Currently, the only option is using cargo. Other installation options may be added later when needed.
+Install **taur** by running the following command:
+
+```sh
+cargo install taur
+```
+
 Usage
 -----
 
