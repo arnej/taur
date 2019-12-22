@@ -335,7 +335,7 @@ fn get_repo_path(
 ) -> Result<Box<PathBuf>, Box<dyn std::error::Error>> {
     match repos {
         Some(s) => Ok(Box::new(s)),
-        None => Ok(Box::new(proj_dirs.data_dir().join("repos").to_path_buf())),
+        None => Ok(Box::new(proj_dirs.data_dir().join("repos"))),
     }
 }
 
