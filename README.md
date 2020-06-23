@@ -38,6 +38,6 @@ Usage
 Status
 ------
 
-**taur** works for my current needs and does so very fast. There is room for improvement though (like using a thread pool and better structuring the code).
+**taur** works for my current needs and does so very fast. There is room for improvement though (like better structuring the code).
 
 Also, new functionality is planned and proposals and pull requests are *very* welcome.
