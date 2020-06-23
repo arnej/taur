@@ -24,9 +24,9 @@ use std::fmt::Display;
 use std::io::{Error, ErrorKind};
 use std::path::{Path, PathBuf};
 use std::sync::mpsc;
-use std::thread;
 use structopt::StructOpt;
 use termion::{color, style};
+use tokio::task;
 
 #[derive(Debug, StructOpt)]
 #[structopt(name = "taur", about = "Tiny AUR helper")]
@@ -100,7 +100,8 @@ impl PartialOrd for UpdateInfo {
     }
 }
 
-fn main() -> Result<(), Box<dyn std::error::Error>> {
+#[tokio::main]
+async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let args = Args::from_args();
 
     let proj_dirs =
@@ -114,12 +115,12 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                 }
             }
             Command::Fetch => {
-                if let Err(e) = fetch(proj_dirs, args.repos) {
+                if let Err(e) = fetch(proj_dirs, args.repos).await {
                     eprintln!("Error while fetching: {}", e);
                 }
             }
             Command::Pull { package_names } => {
-                if let Err(e) = pull(proj_dirs, args.repos, package_names) {
+                if let Err(e) = pull(proj_dirs, args.repos, package_names).await {
                     eprintln!("Error while pulling: {}", e);
                 }
             }
@@ -130,7 +131,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             }
         },
         None => {
-            if let Err(e) = fetch(proj_dirs, args.repos) {
+            if let Err(e) = fetch(proj_dirs, args.repos).await {
                 eprintln!("Error while fetching: {}", e);
             }
         }
@@ -179,7 +180,10 @@ fn clone(
     Ok(())
 }
 
-fn fetch(proj_dirs: ProjectDirs, repos: Option<PathBuf>) -> Result<(), Box<dyn std::error::Error>> {
+async fn fetch(
+    proj_dirs: ProjectDirs,
+    repos: Option<PathBuf>,
+) -> Result<(), Box<dyn std::error::Error>> {
     let repo_path = get_repo_path(proj_dirs, repos)?;
     if !repo_path.exists() {
         std::fs::create_dir_all(repo_path.as_ref())?;
@@ -195,7 +199,7 @@ fn fetch(proj_dirs: ProjectDirs, repos: Option<PathBuf>) -> Result<(), Box<dyn s
     for dir in dirs {
         let tx = mpsc::Sender::clone(&tx);
         let path_base = repo_path.clone();
-        join_handles.push(thread::spawn(move || {
+        join_handles.push(task::spawn_blocking(move || {
             let full_path = path_base.join(dir);
             match check_repo_updates(full_path) {
                 Ok(update_info) => {
@@ -214,7 +218,7 @@ fn fetch(proj_dirs: ProjectDirs, repos: Option<PathBuf>) -> Result<(), Box<dyn s
     drop(tx);
 
     for join_handle in join_handles {
-        if let Err(e) = join_handle.join() {
+        if let Err(e) = join_handle.await {
             return Err(Box::new(Error::new(
                 ErrorKind::Other,
                 format!("Failed to join thread: {:?}", e),
@@ -242,7 +246,7 @@ fn search(expression: &str) -> Result<(), Box<dyn std::error::Error>> {
     Ok(())
 }
 
-fn pull(
+async fn pull(
     proj_dirs: ProjectDirs,
     repos: Option<PathBuf>,
     package_names: &[String],
@@ -257,7 +261,7 @@ fn pull(
     for package_name in package_names {
         let package_name = package_name.clone();
         let path_base = repo_path.clone();
-        join_handles.push(thread::spawn(move || {
+        join_handles.push(task::spawn_blocking(move || {
             if let Err(e) = pull_package(&path_base, &package_name) {
                 eprintln!("Error while pulling package: {:?}", e);
             }
@@ -265,11 +269,11 @@ fn pull(
     }
 
     for join_handle in join_handles {
-        if let Err(e) = join_handle.join() {
+        if let Err(e) = join_handle.await {
             return Err(Box::new(Error::new(
                 ErrorKind::Other,
                 format!("Failed to join thread: {:?}", e),
-            )))
+            )));
         };
     }
 

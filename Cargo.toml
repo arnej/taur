@@ -19,3 +19,4 @@ git2 = "0.13"
 raur = "2.0"
 structopt = "0.3"
 termion = "1.5"
+tokio = { version = "0.2", features = ["blocking", "macros", "rt-threaded"] }
