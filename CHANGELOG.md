@@ -1,4 +1,6 @@
 ## Next Version
+
+## v0.1.5 - 2020-11-24
 ### Added
 - Updated raur to 0.4, now using its async functions
 
