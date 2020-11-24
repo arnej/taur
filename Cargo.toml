@@ -1,6 +1,6 @@
 [package]
 name = "taur"
-version = "0.1.5"
+version = "0.1.6"
 authors = ["Arne Janbu <arnej@arnej.de>"]
 license = "GPL-3.0-or-later"
 homepage = "https://github.com/arnej/taur"
