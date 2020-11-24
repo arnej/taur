@@ -1,4 +1,6 @@
 ## Next Version
+### Fixed
+- Ord and PartialOrd for UpdateInfo now agree with each other
 
 ## v0.1.3 - 2019-11-12
 ### Changed

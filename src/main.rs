@@ -54,7 +54,7 @@ enum Command {
     Pull { package_names: Vec<String> },
 }
 
-#[derive(Eq, Ord)]
+#[derive(Eq)]
 struct UpdateInfo {
     name: String,
     commits: Vec<String>,
@@ -88,6 +88,12 @@ impl Display for UpdateInfo {
     }
 }
 
+impl Ord for UpdateInfo {
+    fn cmp(&self, other: &Self) -> std::cmp::Ordering {
+        self.name.cmp(&other.name)
+    }
+}
+
 impl PartialEq for UpdateInfo {
     fn eq(&self, other: &UpdateInfo) -> bool {
         self.name == other.name
@@ -96,7 +102,7 @@ impl PartialEq for UpdateInfo {
 
 impl PartialOrd for UpdateInfo {
     fn partial_cmp(&self, other: &UpdateInfo) -> Option<std::cmp::Ordering> {
-        self.name.partial_cmp(&other.name)
+        Some(self.cmp(&other))
     }
 }
 
