@@ -5,6 +5,10 @@
 ### Fixed
 - Ord and PartialOrd for UpdateInfo now agree with each other
 
+## v0.1.4 - 2020-06-23
+### Added
+- Switched from manually spawning threads to using tokio
+
 ## v0.1.3 - 2019-11-12
 ### Changed
 - Provide better error messages
