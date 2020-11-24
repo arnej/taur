@@ -1,14 +1,15 @@
-### Next Version
+## Next Version
 
-<a name="v0.1.3"></a>
-### v0.1.3 - 2019-11-12
+## v0.1.3 - 2019-11-12
+### Changed
 - Provide better error messages
-- Bugfix: Check if a repository exists before trying to clone
 
-<a name="v0.1.2"></a>
-### v0.1.2 - 2019-10-28
+### Fixed
+- Check if a repository exists before trying to clone
+
+## v0.1.2 - 2019-10-28
+### Added
 - Print new commits when pulling repositories
 
-<a name="v0.1.1"></a>
-### v0.1.1 - 2019-10-22
+## v0.1.1 - 2019-10-22
 - Initial public release
