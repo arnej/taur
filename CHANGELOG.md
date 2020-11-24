@@ -1,4 +1,7 @@
 ## Next Version
+### Added
+- Updated raur to 0.4, now using its async functions
+
 ### Fixed
 - Ord and PartialOrd for UpdateInfo now agree with each other
 

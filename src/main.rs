@@ -17,13 +17,15 @@
 // * along with this program.  If not, see <http://www.gnu.org/licenses/>. *
 // *************************************************************************
 
-use directories::ProjectDirs;
-use git2::Repository;
 use std::ffi::OsString;
 use std::fmt::Display;
 use std::io::{Error, ErrorKind};
 use std::path::{Path, PathBuf};
 use std::sync::mpsc;
+
+use directories::ProjectDirs;
+use git2::Repository;
+use raur::Raur;
 use structopt::StructOpt;
 use termion::{color, style};
 use tokio::task;
@@ -116,7 +118,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     match &args.command {
         Some(cmd) => match cmd {
             Command::Clone { package_name } => {
-                if let Err(e) = clone(proj_dirs, args.repos, package_name) {
+                if let Err(e) = clone(proj_dirs, args.repos, package_name).await {
                     eprintln!("Error while cloning: {}", e);
                 }
             }
@@ -131,7 +133,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                 }
             }
             Command::Search { expression } => {
-                if let Err(e) = search(expression) {
+                if let Err(e) = search(expression).await {
                     eprintln!("Error while searching: {}", e);
                 }
             }
@@ -146,12 +148,14 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     Ok(())
 }
 
-fn clone(
+async fn clone(
     proj_dirs: ProjectDirs,
     repos: Option<PathBuf>,
     package_name: &str,
 ) -> Result<(), Box<dyn std::error::Error>> {
-    match raur::info(&[package_name]) {
+    let raur = raur::Handle::new();
+
+    match raur.info(&[package_name]).await {
         Ok(pkgs) => {
             if pkgs.is_empty() {
                 return Err(Box::new(Error::new(
@@ -241,8 +245,10 @@ async fn fetch(
     Ok(())
 }
 
-fn search(expression: &str) -> Result<(), Box<dyn std::error::Error>> {
-    let mut pkgs = raur::search(expression)?;
+async fn search(expression: &str) -> Result<(), Box<dyn std::error::Error>> {
+    let raur = raur::Handle::new();
+
+    let mut pkgs = raur.search(expression).await?;
     pkgs.sort_unstable_by(|a, b| a.name.cmp(&b.name));
 
     for pkg in pkgs {
