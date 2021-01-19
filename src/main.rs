@@ -154,18 +154,15 @@ async fn clone(
     package_name: &str,
 ) -> Result<(), Box<dyn std::error::Error>> {
     let raur = raur::Handle::new();
+    let pkgs = raur.info(&[package_name]).await?;
 
-    match raur.info(&[package_name]).await {
-        Ok(pkgs) => {
-            if pkgs.is_empty() {
-                return Err(Box::new(Error::new(
-                    ErrorKind::NotFound,
-                    format!("Package '{}' not found", package_name),
-                )));
-            }
-        }
-        Err(e) => return Err(Box::new(e)),
-    };
+    if pkgs.is_empty() {
+        return Err(Box::new(Error::new(
+            ErrorKind::NotFound,
+            format!("Package '{}' not found", package_name),
+        )));
+    }
+
     let repo_path = get_repo_path(proj_dirs, repos)?;
     if !repo_path.exists() {
         std::fs::create_dir_all(repo_path.as_ref())?;
