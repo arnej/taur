@@ -248,8 +248,32 @@ async fn search(expression: &str) -> Result<(), Box<dyn std::error::Error>> {
     let mut pkgs = raur.search(expression).await?;
     pkgs.sort_unstable_by(|a, b| a.name.cmp(&b.name));
 
+    let longest_len = pkgs
+        .iter()
+        .max_by_key(|p| p.name.len())
+        .map(|p| p.name.len())
+        .unwrap_or_default();
+
+    println!(
+        "{}{}  - {}{}{}{}",
+        style::Bold,
+        "Pop",
+        "Name",
+        " ".repeat(std::cmp::max(longest_len - 3, 0)),
+        "Description",
+        style::Reset
+    );
+
     for pkg in pkgs {
-        println!("{}", pkg.name);
+        println!(
+            "{:.2} - {}{}{}{}{}",
+            pkg.popularity,
+            color::Fg(color::Magenta),
+            pkg.name,
+            style::Reset,
+            " ".repeat(std::cmp::max(longest_len - pkg.name.len() + 1, 0)),
+            pkg.description.unwrap_or_default()
+        );
     }
 
     Ok(())
