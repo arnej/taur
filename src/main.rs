@@ -163,7 +163,7 @@ async fn clone(
         )));
     }
 
-    let repo_path = get_repo_path(proj_dirs, repos)?;
+    let repo_path = get_repo_path(proj_dirs, repos);
     if !repo_path.exists() {
         std::fs::create_dir_all(repo_path.as_ref())?;
     }
@@ -191,7 +191,7 @@ async fn fetch(
     proj_dirs: ProjectDirs,
     repos: Option<PathBuf>,
 ) -> Result<(), Box<dyn std::error::Error>> {
-    let repo_path = get_repo_path(proj_dirs, repos)?;
+    let repo_path = get_repo_path(proj_dirs, repos);
     if !repo_path.exists() {
         std::fs::create_dir_all(repo_path.as_ref())?;
     }
@@ -281,7 +281,7 @@ async fn pull(
     repos: Option<PathBuf>,
     package_names: &[String],
 ) -> Result<(), Box<dyn std::error::Error>> {
-    let repo_path = get_repo_path(proj_dirs, repos)?;
+    let repo_path = get_repo_path(proj_dirs, repos);
     if !repo_path.exists() {
         std::fs::create_dir_all(repo_path.as_ref())?;
     }
@@ -363,13 +363,10 @@ fn pull_package(repo_path: &Path, package_name: &str) -> Result<(), Box<dyn std:
     Ok(())
 }
 
-fn get_repo_path(
-    proj_dirs: ProjectDirs,
-    repos: Option<PathBuf>,
-) -> Result<Box<PathBuf>, Box<dyn std::error::Error>> {
+fn get_repo_path(proj_dirs: ProjectDirs, repos: Option<PathBuf>) -> Box<PathBuf> {
     match repos {
-        Some(s) => Ok(Box::new(s)),
-        None => Ok(Box::new(proj_dirs.data_dir().join("repos"))),
+        Some(s) => Box::new(s),
+        None => Box::new(proj_dirs.data_dir().join("repos")),
     }
 }
 
