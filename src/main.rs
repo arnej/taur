@@ -255,12 +255,9 @@ async fn search(expression: &str) -> Result<(), Box<dyn std::error::Error>> {
         .unwrap_or_default();
 
     println!(
-        "{}{}  - {}{}{}{}",
+        "{}Pop  - Name{}Description{}",
         style::Bold,
-        "Pop",
-        "Name",
         " ".repeat(std::cmp::max(longest_len - 3, 0)),
-        "Description",
         style::Reset
     );
 
