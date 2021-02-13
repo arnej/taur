@@ -109,7 +109,7 @@ impl PartialOrd for UpdateInfo {
 }
 
 #[tokio::main]
-async fn main() -> Result<(), Box<dyn std::error::Error>> {
+async fn main() {
     let args = Args::from_args();
 
     let proj_dirs =
@@ -144,8 +144,6 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             }
         }
     }
-
-    Ok(())
 }
 
 async fn clone(
