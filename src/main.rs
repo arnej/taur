@@ -168,9 +168,7 @@ async fn clone(
 
     let repo_path = repo_path.join(package_name);
 
-    let mut url = String::from("https://aur.archlinux.org/");
-    url.push_str(package_name);
-    url.push_str(".git");
+    let url = format!("https://aur.archlinux.org/{}.git", package_name);
 
     match Repository::clone(&url, &repo_path) {
         Ok(_) => println!("Cloned repo '{}' to '{:?}'", package_name, repo_path),
