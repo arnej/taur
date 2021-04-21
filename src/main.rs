@@ -221,12 +221,7 @@ async fn fetch(
     drop(tx);
 
     for join_handle in join_handles {
-        if let Err(e) = join_handle.await {
-            return Err(Box::new(Error::new(
-                ErrorKind::Other,
-                format!("Failed to join thread: {:?}", e),
-            )));
-        };
+        join_handle.await?;
     }
 
     for received in rx {
@@ -295,12 +290,7 @@ async fn pull(
     }
 
     for join_handle in join_handles {
-        if let Err(e) = join_handle.await {
-            return Err(Box::new(Error::new(
-                ErrorKind::Other,
-                format!("Failed to join thread: {:?}", e),
-            )));
-        };
+        join_handle.await?;
     }
 
     Ok(())
