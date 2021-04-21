@@ -414,7 +414,7 @@ fn check_repo_updates(path: PathBuf) -> Result<Option<UpdateInfo>, Box<dyn std::
     Ok(None)
 }
 
-fn get_dir_list(pathbuf: &PathBuf) -> Result<Vec<OsString>, Error> {
+fn get_dir_list(pathbuf: &Path) -> Result<Vec<OsString>, Error> {
     let path = Path::new(pathbuf);
     let path_iter = std::fs::read_dir(path)?;
 
