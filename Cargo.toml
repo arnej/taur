@@ -14,7 +14,7 @@ A tiny helper for managing AUR package repositories.
 edition = "2018"
 
 [dependencies]
-directories = "3.0"
+directories = "4.0"
 git2 = "0.13"
 raur = "5.0"
 structopt = "0.3"
