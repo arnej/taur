@@ -15,7 +15,7 @@ edition = "2018"
 
 [dependencies]
 directories = "4.0"
-git2 = "0.13"
+git2 = "0.14"
 raur = "5.0"
 structopt = "0.3"
 termion = "1.5"
