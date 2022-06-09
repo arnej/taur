@@ -661,16 +661,14 @@ dependencies = [
 
 [[package]]
 name = "raur"
-version = "5.0.1"
+version = "6.0.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "fdfdf9ad20905a8bd2d95c1f7c7b374930f0f0fd014c084b68c34f1a79fd85cd"
+checksum = "86e7cb15e8c14377d8d2f8bea32a8b135a5c9d64c5ec4a3ea7cf5d703a4bd227"
 dependencies = [
  "async-trait",
  "reqwest",
  "serde",
  "serde_derive",
- "serde_json",
- "url",
 ]
 
 [[package]]
