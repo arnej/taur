@@ -104,7 +104,7 @@ impl PartialEq for UpdateInfo {
 
 impl PartialOrd for UpdateInfo {
     fn partial_cmp(&self, other: &UpdateInfo) -> Option<std::cmp::Ordering> {
-        Some(self.cmp(&other))
+        Some(self.cmp(other))
     }
 }
 
@@ -380,7 +380,7 @@ fn check_repo_updates(path: PathBuf) -> Result<Option<UpdateInfo>, Box<dyn std::
     let dir_name = String::from(dir_name.to_string_lossy());
 
     let repo = Repository::open(path)?;
-    let mut remote = repo.find_remote(&"origin")?;
+    let mut remote = repo.find_remote("origin")?;
     remote.fetch(&["master"], None, None)?;
 
     let local_rev = repo.revparse_single("HEAD")?;
