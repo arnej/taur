@@ -23,10 +23,10 @@ use std::io::{Error, ErrorKind};
 use std::path::{Path, PathBuf};
 use std::sync::mpsc;
 
+use clap::StructOpt;
 use directories::ProjectDirs;
 use git2::Repository;
 use raur::Raur;
-use structopt::StructOpt;
 use termion::{color, style};
 use tokio::task;
 
