@@ -23,36 +23,36 @@ use std::io::{Error, ErrorKind};
 use std::path::{Path, PathBuf};
 use std::sync::mpsc;
 
-use clap::StructOpt;
+use clap::Parser;
 use directories::ProjectDirs;
 use git2::Repository;
 use raur::Raur;
 use termion::{color, style};
 use tokio::task;
 
-#[derive(Debug, StructOpt)]
-#[structopt(name = "taur", about = "Tiny AUR helper")]
+#[derive(Debug, Parser)]
+#[command(name = "taur", about = "Tiny AUR helper")]
 struct Args {
     /// Local repo storage path (defaults to $HOME/.local/share/taur/repos)
-    #[structopt()]
+    #[arg()]
     repos: Option<PathBuf>,
-    #[structopt(subcommand)]
+    #[command(subcommand)]
     command: Option<Command>,
 }
 
-#[derive(Debug, StructOpt)]
+#[derive(Debug, Parser)]
 enum Command {
     /// Clone a repository from AUR
-    #[structopt(name = "clone")]
+    #[command(name = "clone")]
     Clone { package_name: String },
     /// Fetch and print new commits for all repositories
-    #[structopt(name = "fetch")]
+    #[command(name = "fetch")]
     Fetch,
     /// Search for packages in AUR
-    #[structopt(name = "search")]
+    #[command(name = "search")]
     Search { expression: String },
     /// Pull given package repositories (if no package is specified, all repositories are pulled)
-    #[structopt(name = "pull")]
+    #[command(name = "pull")]
     Pull { package_names: Vec<String> },
 }
 
@@ -110,7 +110,7 @@ impl PartialOrd for UpdateInfo {
 
 #[tokio::main]
 async fn main() {
-    let args = Args::from_args();
+    let args = Args::parse();
 
     let proj_dirs =
         ProjectDirs::from("", "", "taur").expect("Unable to retrieve application directories");

@@ -14,7 +14,7 @@ A tiny helper for managing AUR package repositories.
 edition = "2018"
 
 [dependencies]
-clap = { version = "3.0", features = ["derive"] }
+clap = { version = "4.0", features = ["derive", "help", "usage", "error-context", "wrap_help"] }
 directories = "4.0"
 git2 = "0.14"
 raur = "6.0"
