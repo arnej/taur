@@ -18,5 +18,5 @@ clap = { version = "4.0", features = ["derive", "help", "usage", "error-context"
 directories = "4.0"
 git2 = "0.14"
 raur = "6.0"
-termion = "1.5"
+termion = "2.0"
 tokio = { version = "1.8", features = ["macros", "rt-multi-thread"] }
