@@ -16,7 +16,7 @@ edition = "2018"
 [dependencies]
 clap = { version = "4.0", features = ["derive", "help", "usage", "error-context", "wrap_help"] }
 directories = "4.0"
-git2 = "0.14"
+git2 = "0.15"
 raur = "6.0"
 termion = "2.0"
 tokio = { version = "1.8", features = ["macros", "rt-multi-thread"] }
