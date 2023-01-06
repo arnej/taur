@@ -19,4 +19,4 @@ directories = "4.0"
 git2 = "0.15"
 raur = "6.0"
 termion = "2.0"
-tokio = { version = "1.8", features = ["macros", "rt-multi-thread"] }
+tokio = { version = "1.23", features = ["macros", "rt-multi-thread"] }
