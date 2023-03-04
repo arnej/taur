@@ -220,9 +220,7 @@ async fn fetch(
     // Drop tx to get rid of the original unused sender
     drop(tx);
 
-    for join_handle in join_handles {
-        join_handle.await?;
-    }
+    futures::future::join_all(join_handles).await;
 
     for received in rx {
         update_infos.push(received);
@@ -289,9 +287,7 @@ async fn pull(
         }));
     }
 
-    for join_handle in join_handles {
-        join_handle.await?;
-    }
+    futures::future::join_all(join_handles).await;
 
     Ok(())
 }

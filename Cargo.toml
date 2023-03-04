@@ -16,6 +16,7 @@ edition = "2018"
 [dependencies]
 clap = { version = "4.1", features = ["derive", "help", "usage", "error-context", "wrap_help"] }
 directories = "4.0"
+futures = { version = "0.3.26", features = ["std"] }
 git2 = "0.16"
 raur = "7.0"
 termion = "2.0"
