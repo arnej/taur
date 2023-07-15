@@ -1,5 +1,9 @@
 ## Next Version
 
+## v0.2.0 - 2023-07-15
+### Fixed
+- Fixed asynchronous handling of git commands (this is also a nice performance boost)
+
 ## v0.1.6 - 2020-11-24
 ### Fixed
 - Forgot updating Cargo.lock
