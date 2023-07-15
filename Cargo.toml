@@ -17,7 +17,7 @@ edition = "2018"
 clap = { version = "4.1", features = ["derive", "help", "usage", "error-context", "wrap_help"] }
 directories = "5.0"
 futures = { version = "0.3.26", features = ["std"] }
-git2 = "0.16"
+git2 = "0.17"
 raur = "7.0"
 termion = "2.0"
 tokio = { version = "1.26", features = ["macros", "rt-multi-thread"] }
