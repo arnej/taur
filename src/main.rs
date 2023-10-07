@@ -237,6 +237,11 @@ async fn search(expression: &str) -> Result<(), Box<dyn std::error::Error>> {
     let mut pkgs = raur.search(expression).await?;
     pkgs.sort_unstable_by(|a, b| a.name.cmp(&b.name));
 
+    if pkgs.len() == 0 {
+        println!("No packages found");
+        return Ok(());
+    }
+
     let longest_len = pkgs
         .iter()
         .max_by_key(|p| p.name.len())
