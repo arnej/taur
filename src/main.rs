@@ -237,7 +237,7 @@ async fn search(expression: &str) -> Result<(), Box<dyn std::error::Error>> {
     let mut pkgs = raur.search(expression).await?;
     pkgs.sort_unstable_by(|a, b| a.name.cmp(&b.name));
 
-    if pkgs.len() == 0 {
+    if pkgs.is_empty() {
         println!("No packages found");
         return Ok(());
     }
