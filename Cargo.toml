@@ -19,5 +19,5 @@ directories = "5.0"
 futures = { version = "0.3.26", features = ["std"] }
 git2 = "0.18"
 raur = "7.0"
-termion = "2.0"
+termion = "3.0"
 tokio = { version = "1.26", features = ["macros", "rt-multi-thread"] }
